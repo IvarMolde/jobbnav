@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobbintervju – trekning og spørsmål</title>
+<style>
+:root{
+  --ink:#172b3a; --muted:#526575; --navy:#12344a; --blue:#176b87;
+  --pale:#eef5f7; --white:#fff; --green:#176b48; --green-bg:#e9f5ee;
+  --amber:#81520b; --amber-bg:#fff4d9; --line:#c8d6dc;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f7f8;color:var(--ink);font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.45}
+header{background:var(--navy);color:#fff;padding:24px 3vw}
+header h1{font-size:clamp(30px,3vw,46px);margin:0 0 5px}
+header p{margin:0;color:#e4eef2;font-size:20px}
+main{max-width:1600px;margin:auto;padding:24px 3vw 40px}
+.layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(360px,.85fr);gap:22px;align-items:start}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 3px 12px #12344a0d}
+h2{font-size:28px;margin:0 0 16px;color:var(--navy)}
+h3{font-size:22px;margin:0 0 10px}
+.draw-area{text-align:center;background:var(--pale);border-radius:14px;padding:24px}
+.draw-card{width:min(100%,560px);min-height:170px;margin:0 auto 18px;border:3px solid var(--blue);border-radius:16px;background:#fff;color:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font:inherit;font-weight:700;box-shadow:0 5px 0 #c6dce3;transition:transform .15s,background .15s}
+.draw-card:hover{background:#f7fcfd;transform:translateY(-2px)}
+.draw-card:focus-visible,button:focus-visible{outline:4px solid #f0b429;outline-offset:4px}
+.draw-card .icon{font-size:40px;line-height:1.1}
+.draw-card .label{font-size:clamp(27px,3vw,38px);margin-top:8px}
+.draw-card small{font-size:17px;font-weight:400;color:var(--muted);margin-top:4px}
+.result{min-height:118px;margin:14px auto 0;max-width:700px;padding:18px;border-radius:12px;background:#fff;border:2px dashed var(--line)}
+.result .eyebrow{font-size:16px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.result .name{font-size:clamp(30px,3.4vw,46px);font-weight:800;color:var(--navy);line-height:1.15;margin:6px 0}
+.result .company{font-size:clamp(21px,2.2vw,28px);font-weight:700}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:13px 20px;cursor:pointer}
+.primary{background:var(--blue);color:#fff}
+.secondary{background:#e7eef1;color:var(--navy);border:1px solid var(--line)}
+.success{background:var(--green);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.note{margin-top:16px;padding:14px 16px;border-left:5px solid #c18a22;background:var(--amber-bg);color:#533b12;border-radius:8px;font-size:18px}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.listbox{background:#f8fafb;border:1px solid var(--line);border-radius:12px;padding:15px;min-height:180px}
+.count{display:inline-block;min-width:30px;text-align:center;border-radius:20px;background:#dce9ed;padding:1px 8px;margin-left:5px;font-size:17px}
+ul.people{list-style:none;margin:0;padding:0}
+.people li{padding:8px 2px;border-bottom:1px solid #e2e9ec;font-size:18px}
+.people li:last-child{border:0}
+.people strong{display:block}
+.people span{display:block;color:var(--muted);font-size:16px}
+.empty{color:var(--muted);font-style:italic;font-size:17px}
+.questions{display:grid;gap:10px}
+.question{display:flex;gap:14px;align-items:flex-start;background:#f3f7f8;border:1px solid #d7e2e6;border-radius:10px;padding:13px 15px}
+.num{flex:0 0 38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:19px}
+.question p{margin:2px 0;font-size:21px;font-weight:600}
+.progress{height:12px;background:#e2eaed;border-radius:20px;overflow:hidden;margin:12px 0 6px}
+.progress>div{height:100%;width:0;background:var(--green);transition:width .25s}
+.footer{font-size:16px;color:var(--muted);margin-top:16px}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.columns{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){body{font-size:18px}.columns{grid-template-columns:1fr}.panel{padding:16px}header{padding:20px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Jobbintervju – hvem trekkes?</h1>
+  <p>Vi øver på å presentere oss selv og svare på spørsmål i et jobbintervju.</p>
+</header>
+<main>
+<div class="layout">
+  <section class="panel" aria-labelledby="draw-heading">
+    <h2 id="draw-heading">1. Trekk en elev</h2>
+    <div class="draw-area">
+      <button class="draw-card" id="drawButton" type="button" aria-label="Trekk neste elev">
+        <span class="icon" aria-hidden="true">🎴</span>
+        <span class="label">ELEV</span>
+        <small>Klikk her for å trekke neste elev</small>
+      </button>
+      <div class="result" id="result" aria-live="polite" aria-atomic="true">
+        <div class="eyebrow">Neste deltaker</div>
+        <div class="name">Klar for trekning?</div>
+        <div class="company">Trykk på kortet «ELEV»</div>
+      </div>
+      <div class="actions">
+        <button class="success" id="completeButton" type="button" disabled>✓ Marker intervju gjennomført</button>
+        <button class="secondary" id="resetButton" type="button">Start på nytt</button>
+      </div>
+    </div>
+    <div class="note"><strong>Praktisk beskjed:</strong> Kataryna har time hos logoped med barna i morgen kl. 13. Avtal tidspunkt for intervjuet hennes.</div>
+    <div class="columns">
+      <div class="listbox">
+        <h3>Gjenstår <span class="count" id="remainingCount">10</span></h3>
+        <ul class="people" id="remainingList"></ul>
+      </div>
+      <div class="listbox">
+        <h3>Intervjuet <span class="count" id="completedCount">0</span></h3>
+        <ul class="people" id="completedList"><li class="empty">Ingen intervju er gjennomført ennå.</li></ul>
+      </div>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Intervjuer gjennomført" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="progress"><div id="progressFill"></div></div>
+    <div class="footer" id="progressText">0 av 10 intervjuer gjennomført</div>
+  </section>
+
+  <section class="panel" aria-labelledby="questions-heading">
+    <h2 id="questions-heading">2. Spørsmål i jobbintervjuet</h2>
+    <p style="margin-top:-8px;color:var(--muted)">Bruk spørsmålene som støtte under intervjuet.</p>
+    <div class="questions">
+      <div class="question"><span class="num">1</span><p>Kan du si litt om deg selv?</p></div>
+      <div class="question"><span class="num">2</span><p>Kjenner du til oss?</p></div>
+      <div class="question"><span class="num">3</span><p>Hvorfor har du søkt denne jobben?</p></div>
+      <div class="question"><span class="num">4</span><p>Hva er dine sterke sider?</p></div>
+      <div class="question"><span class="num">5</span><p>Hva er dine svake sider?</p></div>
+      <div class="question"><span class="num">6</span><p>Hvorfor skal vi ansette deg?</p></div>
+      <div class="question"><span class="num">7</span><p>Har du noen spørsmål til oss?</p></div>
+    </div>
+    <p class="footer">Tips: Snakk tydelig, ha øyekontakt, og bruk gjerne eksempler fra skole, praksis eller arbeid.</p>
+  </section>
+</div>
+</main>
+<script>
+const original = [
+  {name:"Kataryna", company:"Bergmo sykehjem"},
+  {name:"Nataliia S", company:"Bussbygg"},
+  {name:"Ivan", company:"Nor-Log"},
+  {name:"Nathalia", company:"Rema 1000 Moldegård"},
+  {name:"Maryna", company:"Espresso House"},
+  {name:"Tamara", company:"Narvesen"},
+  {name:"Olena S.", company:"Coop Mega Molde storsenter"},
+  {name:"Sunday", company:"Bergmo omsorgssenter"},
+  {name:"Lilia", company:"Sykehusapoteket SNR"},
+  {name:"Albert", company:"Vikenco"},
+  {name:"Anastasiia", company:"Pizzabakeren Fannestrandveien (ved Roseby)"}
+];
+let remaining = [], completed = [], current = null;
+const $ = id => document.getElementById(id);
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function start(){
+  // Anastasiia er låst til siste plass. De øvrige trekkes tilfeldig.
+  remaining = [...shuffle(original.slice(0,-1)), original[original.length-1]];
+  completed=[]; current=null;
+  $("result").innerHTML='<div class="eyebrow">Neste deltaker</div><div class="name">Klar for trekning?</div><div class="company">Trykk på kortet «ELEV»</div>';
+  $("completeButton").disabled=true;
+  $("drawButton").disabled=false;
+  render();
+}
+function draw(){
+  if(current || remaining.length===0) return;
+  current=remaining.shift();
+  $("result").innerHTML=`<div class="eyebrow">Denne eleven er trukket</div><div class="name">${escapeHtml(current.name)}</div><div class="company">${escapeHtml(current.company)}</div>`;
+  $("completeButton").disabled=false;
+  $("drawButton").disabled=true;
+  render();
+}
+function markComplete(){
+  if(!current) return;
+  completed.push(current); current=null;
+  $("completeButton").disabled=true;
+  $("drawButton").disabled=remaining.length===0;
+  if(remaining.length===0){
+    $("result").innerHTML='<div class="eyebrow">Alle elever er trukket</div><div class="name">Flott gjennomført!</div><div class="company">Alle har fått sin intervjutur.</div>';
+  } else {
+    $("result").innerHTML='<div class="eyebrow">Intervju registrert</div><div class="name">Bra jobbet!</div><div class="company">Trykk på «ELEV» for neste trekning.</div>';
+  }
+  render();
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function listMarkup(items){
+  if(!items.length) return '<li class="empty">Ingen elever her ennå.</li>';
+  return items.map(p=>`<li><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.company)}</span></li>`).join('');
+}
+function render(){
+  $("remainingList").innerHTML=listMarkup(remaining);
+  $("completedList").innerHTML=completed.length?listMarkup(completed):'<li class="empty">Ingen intervju er gjennomført ennå.</li>';
+  $("remainingCount").textContent=remaining.length;
+  $("completedCount").textContent=completed.length;
+  const pct=completed.length/original.length*100;
+  $("progressFill").style.width=pct+'%';
+  $("progress").setAttribute('aria-valuemax',original.length);
+  $("progress").setAttribute('aria-valuenow',completed.length);
+  $("progressText").textContent=`${completed.length} av ${original.length} intervjuer gjennomført`;
+}
+$("drawButton").addEventListener('click',draw);
+$("completeButton").addEventListener('click',markComplete);
+$("resetButton").addEventListener('click',start);
+start();
+</script>
+</body>
+</html>
